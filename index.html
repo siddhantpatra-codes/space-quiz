@@ -41,23 +41,23 @@ button.opt:disabled{cursor:default}
 </main>
 <script>
 const Q=[
-["Who was the first human in space?",["Neil Armstrong","Yuri Gagarin","Buzz Aldrin","Alan Shepard"],1],
-["Which year did Apollo 11 land on the Moon?",["1965","1969","1972","1975"],1],
-["Which planet has the Great Red Spot?",["Mars","Saturn","Jupiter","Neptune"],2],
-["What is the name of NASA's Mars rover that landed in 2021?",["Curiosity","Opportunity","Perseverance","Spirit"],2],
-["Which probe left the solar system into interstellar space first?",["Voyager 1","Pioneer 10","New Horizons","Cassini"],0],
-["What was the first artificial satellite?",["Explorer 1","Sputnik 1","Vanguard 1","Telstar"],1],
-["Which telescope launched in 2021 observes in infrared?",["Hubble","Kepler","James Webb","Spitzer"],2],
-["Which moon of Saturn has a thick atmosphere?",["Europa","Titan","Io","Triton"],1],
-["Who was the first woman in space?",["Sally Ride","Valentina Tereshkova","Mae Jemison","Peggy Whitson"],1],
-["What was the name of the first reusable US space shuttle to fly?",["Columbia","Challenger","Discovery","Atlantis"],0]];
+["Who was the first human in space?",["Neil Armstrong","Yuri Gagarin","Buzz Aldrin","Alan Shepard"],1,"Gagarin orbited Earth aboard Vostok 1 on April 12, 1961."],
+["Which year did Apollo 11 land on the Moon?",["1965","1969","1972","1975"],1,"Apollo 11's Lunar Module touched down on July 20, 1969."],
+["Which planet has the Great Red Spot?",["Mars","Saturn","Jupiter","Neptune"],2,"The Great Red Spot is a giant storm in Jupiter's atmosphere, observed for centuries."],
+["What is the name of NASA's Mars rover that landed in 2021?",["Curiosity","Opportunity","Perseverance","Spirit"],2,"Perseverance landed in Jezero Crater in 2021 to study ancient Martian environments and collect samples."],
+["Which probe left the solar system into interstellar space first?",["Voyager 1","Pioneer 10","New Horizons","Cassini"],0,"Voyager 1 crossed the heliosphere into interstellar space in 2012, becoming the first spacecraft to do so."],
+["What was the first artificial satellite?",["Explorer 1","Sputnik 1","Vanguard 1","Telstar"],1,"The Soviet Union launched Sputnik 1 on October 4, 1957, making it the first artificial satellite to orbit Earth."],
+["Which telescope launched in 2021 observes in infrared?",["Hubble","Kepler","James Webb","Spitzer"],2,"The James Webb Space Telescope studies the universe primarily in infrared light."],
+["Which moon of Saturn has a thick atmosphere?",["Europa","Titan","Io","Triton"],1,"Titan's dense atmosphere is mostly nitrogen, making it the only moon with a thick atmosphere."],
+["Who was the first woman in space?",["Sally Ride","Valentina Tereshkova","Mae Jemison","Peggy Whitson"],1,"Tereshkova flew aboard Vostok 6 in 1963, becoming the first woman in space."],
+["What was the name of the first reusable US space shuttle to fly?",["Columbia","Challenger","Discovery","Atlantis"],0,"Columbia was the first Space Shuttle orbiter to fly in space, launching on STS-1 in 1981."]];
 const app=document.getElementById("app");
 let i=0,score=0;
 function show(){
   if(i>=Q.length)return end();
-  const [q,o,a]=Q[i];
+  const [q,o,a,fact]=Q[i];
   app.innerHTML=`<div class="top"><span>Question ${i+1} / ${Q.length}</span><span>Score: ${score}</span></div>
-  <div class="bar"><i style="width:${i/Q.length*100}%"></i></div><h2></h2><div id="o"></div><button class="next" hidden></button>`;
+  <div class="bar"><i style="width:${i/Q.length*100}%"></i></div><h2></h2><div id="o"></div><div id="feedback" aria-live="polite" aria-atomic="true"></div><button class="next" hidden></button>`;
   app.querySelector("h2").textContent=q;
   const box=app.querySelector("#o"),next=app.querySelector(".next");
   o.forEach((t,k)=>{
@@ -66,6 +66,9 @@ function show(){
       box.querySelectorAll("button").forEach(x=>x.disabled=true);
       if(k===a){score++;b.classList.add("ok");app.querySelector(".top span:last-child").textContent="Score: "+score}
       else{b.classList.add("bad");box.children[a].classList.add("ok")}
+      app.querySelector("#feedback").textContent=k===a
+        ?`Correct! ${fact}`
+        :`Incorrect. The correct answer is ${o[a]}. ${fact}`;
       app.querySelector(".bar i").style.width=(i+1)/Q.length*100+"%";
       next.textContent=i+1<Q.length?"Next →":"See results";next.hidden=false;next.focus();
     };
