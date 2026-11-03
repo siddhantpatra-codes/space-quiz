@@ -32,6 +32,9 @@ button.opt:disabled{cursor:default}
 .next,.again{margin-top:6px;padding:10px 18px;font:inherit;font-weight:600;color:#fff;background:var(--accent);border:0;border-radius:10px;cursor:pointer}
 .next[hidden]{display:none}
 .res{text-align:center}.res .emoji{font-size:64px;animation:pop .6s}.res .big{font-size:32px;font-weight:700}
+.review{text-align:left;margin:16px 0}.review summary{color:var(--accent);font-weight:600;cursor:pointer}
+.review-item{padding:10px 0;border-top:1px solid var(--bd)}.review-item p{margin:4px 0}
+.review-item .correct{color:var(--ok);font-weight:600}.review-item .incorrect{color:var(--bad);font-weight:600}
 </style>
 </head>
 <body>
@@ -52,7 +55,7 @@ const Q=[
 ["Who was the first woman in space?",["Sally Ride","Valentina Tereshkova","Mae Jemison","Peggy Whitson"],1],
 ["What was the name of the first reusable US space shuttle to fly?",["Columbia","Challenger","Discovery","Atlantis"],0]];
 const app=document.getElementById("app");
-let i=0,score=0;
+let i=0,score=0,answers=[];
 function show(){
   if(i>=Q.length)return end();
   const [q,o,a]=Q[i];
@@ -64,6 +67,7 @@ function show(){
     const b=document.createElement("button");b.className="opt";b.textContent=t;
     b.onclick=()=>{
       box.querySelectorAll("button").forEach(x=>x.disabled=true);
+      answers[i]=k;
       if(k===a){score++;b.classList.add("ok");app.querySelector(".top span:last-child").textContent="Score: "+score}
       else{b.classList.add("bad");box.children[a].classList.add("ok")}
       app.querySelector(".bar i").style.width=(i+1)/Q.length*100+"%";
@@ -77,7 +81,20 @@ function end(){
   const p=score/Q.length,e=p==1?"🏆":p>=.8?"🤩":p>=.6?"😎":p>=.4?"🙂":"🌑";
   const m=p==1?"Perfect! Mission commander material.":p>=.6?"Great flight!":"Keep exploring — try again!";
   app.innerHTML=`<div class="res"><div class="emoji">${e}</div><div class="big">${score} / ${Q.length}</div><p>${m}</p><button class="again">Play again</button></div>`;
-  app.querySelector(".again").onclick=()=>{i=score=0;show()};
+  const review=document.createElement("details");review.className="review";
+  const summary=document.createElement("summary");summary.textContent="Review your answers";review.appendChild(summary);
+  Q.forEach(([q,o,a],n)=>{
+    const item=document.createElement("div");item.className="review-item";
+    const question=document.createElement("p");question.textContent=`${n+1}. ${q}`;
+    const answer=document.createElement("p");answer.textContent=`Your answer: ${o[answers[n]]??"Not answered"}`;
+    const correct=document.createElement("p");correct.textContent=`Correct answer: ${o[a]}`;
+    const status=document.createElement("p");
+    const isCorrect=answers[n]===a;
+    status.className=isCorrect?"correct":"incorrect";status.textContent=isCorrect?"Correct":"Incorrect";
+    item.append(question,answer,correct,status);review.appendChild(item);
+  });
+  app.querySelector(".res").insertBefore(review,app.querySelector(".again"));
+  app.querySelector(".again").onclick=()=>{i=score=0;answers=[];show()};
 }
 show();
 </script>
